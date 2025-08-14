@@ -8,92 +8,127 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var audioClassifier = AudioClassifier()
+    @StateObject private var soundAnalyzer = SimpleSoundClassifier()
     
     var body: some View {
-        VStack(spacing: 30) {
-            Text("Audio Sentiment Classifier")
-                .font(.title)
-                .fontWeight(.bold)
-            
-            VStack(spacing: 15) {
-                Text("Classification:")
-                    .font(.headline)
-                
-                Text(audioClassifier.currentClassification)
+        VStack(spacing: 40) {
+            // Header
+            VStack(spacing: 10) {
+                Text("🎵 Apple SoundAnalysis")
                     .font(.largeTitle)
-                    .fontWeight(.semibold)
-                    .foregroundColor(audioClassifier.isRecording ? .blue : .gray)
+                    .fontWeight(.bold)
                 
-                if audioClassifier.confidence > 0 {
-                    Text("Confidence: \(String(format: "%.1f%%", audioClassifier.confidence * 100))")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                
-                // Audio level indicator
-                if audioClassifier.isRecording {
-                    VStack(spacing: 8) {
-                        HStack {
-                            Text("Audio Input:")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            
-                            Circle()
-                                .fill(audioClassifier.isReceivingAudio ? .green : .red)
-                                .frame(width: 8, height: 8)
-                            
-                            Text(audioClassifier.isReceivingAudio ? "Detected" : "No Signal")
-                                .font(.caption)
-                                .foregroundColor(audioClassifier.isReceivingAudio ? .green : .red)
-                        }
-                        
-                        // Audio level bar
-                        GeometryReader { geometry in
-                            ZStack(alignment: .leading) {
-                                Rectangle()
-                                    .fill(Color.gray.opacity(0.3))
-                                    .frame(height: 4)
-                                
-                                Rectangle()
-                                    .fill(Color.blue)
-                                    .frame(width: geometry.size.width * CGFloat(audioClassifier.audioLevel), height: 4)
-                                    .animation(.easeInOut(duration: 0.1), value: audioClassifier.audioLevel)
-                            }
-                        }
-                        .frame(height: 4)
-                        
-                        Text("Level: \(String(format: "%.1f%%", audioClassifier.audioLevel * 100))")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-                }
+                Text("AI-powered sound recognition with 300+ categories")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
             }
-            .padding()
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(10)
             
+            Spacer()
+            
+            // Main detection display
+            VStack(spacing: 20) {
+                Text("I can hear:")
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+                
+                Text(soundAnalyzer.currentTopSound)
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundColor(soundAnalyzer.isListening ? .primary : .gray)
+                    .multilineTextAlignment(.center)
+                    .frame(minHeight: 80)
+                    .animation(.easeInOut(duration: 0.3), value: soundAnalyzer.currentTopSound)
+            }
+            .padding(30)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+            )
+            
+            // Audio visualization
+            if soundAnalyzer.isListening {
+                VStack(spacing: 10) {
+                    Text("Audio Level")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    GeometryReader { geometry in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(height: 8)
+                            
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [.green, .yellow, .red],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(width: geometry.size.width * CGFloat(soundAnalyzer.audioLevel), height: 8)
+                                .animation(.easeInOut(duration: 0.1), value: soundAnalyzer.audioLevel)
+                        }
+                    }
+                    .frame(height: 8)
+                }
+                .padding(.horizontal, 40)
+            }
+            
+            Spacer()
+            
+            // Action button
             Button(action: {
-                if audioClassifier.isRecording {
-                    audioClassifier.stopRecording()
+                if soundAnalyzer.isListening {
+                    soundAnalyzer.stopListening()
                 } else {
-                    audioClassifier.startRecording()
+                    soundAnalyzer.startListening()
                 }
             }) {
-                HStack {
-                    Image(systemName: audioClassifier.isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                        .font(.title2)
-                    Text(audioClassifier.isRecording ? "Stop Listening" : "Start Listening")
+                HStack(spacing: 15) {
+                    Image(systemName: soundAnalyzer.isListening ? "stop.circle.fill" : "waveform.circle.fill")
+                        .font(.title)
+                    
+                    Text(soundAnalyzer.isListening ? "Stop Listening" : "Start Sound Detection")
+                        .font(.title3)
                         .fontWeight(.semibold)
                 }
-                .padding()
-                .background(audioClassifier.isRecording ? Color.red : Color.blue)
                 .foregroundColor(.white)
-                .cornerRadius(10)
+                .padding(.horizontal, 30)
+                .padding(.vertical, 15)
+                .background(
+                    Capsule()
+                        .fill(soundAnalyzer.isListening ? 
+                              LinearGradient(colors: [.red, .pink], startPoint: .leading, endPoint: .trailing) :
+                              LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
+                        )
+                )
+                .scaleEffect(soundAnalyzer.isListening ? 1.05 : 1.0)
+                .animation(.easeInOut(duration: 0.2), value: soundAnalyzer.isListening)
             }
             
-            if let error = audioClassifier.error {
-                Text("Error: \(error)")
+            // Demo instructions
+            if !soundAnalyzer.isListening {
+                VStack(spacing: 8) {
+                    Text("Try these sounds:")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    
+                    Text("👏 Clap • 🗣️ Talk • ⌨️ Type • 🎵 Play music")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+            
+            // Error display
+            if let error = soundAnalyzer.error {
+                Text("⚠️ \(error)")
+                    .font(.caption)
                     .foregroundColor(.red)
                     .padding()
                     .background(Color.red.opacity(0.1))
@@ -102,7 +137,15 @@ struct ContentView: View {
             
             Spacer()
         }
-        .padding()
+        .padding(20)
+        .background(
+            LinearGradient(
+                colors: [Color(.systemGray6), Color(.systemBackground)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        )
     }
 }
 
