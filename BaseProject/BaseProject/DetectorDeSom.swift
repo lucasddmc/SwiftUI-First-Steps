@@ -2,11 +2,11 @@ import Foundation
 import AVFoundation
 import SoundAnalysis
 
-class SimpleSoundClassifier: NSObject, ObservableObject {
-    @Published var isListening = false
-    @Published var currentTopSound = "Not listening"
+class DetectorDeSom: NSObject, ObservableObject {
+    @Published var ouvindo = false
+    @Published var somIdentificado = "Not listening"
     @Published var audioLevel: Float = 0.0
-    @Published var error: String?
+    @Published var erro: String?
     
     private var audioEngine = AVAudioEngine()
     private var streamAnalyzer: SNAudioStreamAnalyzer?
@@ -24,12 +24,12 @@ class SimpleSoundClassifier: NSObject, ObservableObject {
             try audioSession.setActive(false)
         } catch {
             DispatchQueue.main.async {
-                self.error = "Audio session setup failed: \(error.localizedDescription)"
+                self.erro = "Audio session setup failed: \(error.localizedDescription)"
             }
         }
     }
     
-    func startListening() {
+    func ouvir() {
         guard !audioEngine.isRunning else { return }
         
         do {
@@ -73,19 +73,19 @@ class SimpleSoundClassifier: NSObject, ObservableObject {
             try audioEngine.start()
             
             DispatchQueue.main.async {
-                self.isListening = true
-                self.error = nil
-                self.currentTopSound = "Listening..."
+                self.ouvindo = true
+                self.erro = nil
+                self.somIdentificado = "Listening..."
             }
             
         } catch {
             DispatchQueue.main.async {
-                self.error = "Failed to start: \(error.localizedDescription)"
+                self.erro = "Failed to start: \(error.localizedDescription)"
             }
         }
     }
     
-    func stopListening() {
+    func pararDeOuvir() {
         if audioEngine.isRunning {
             audioEngine.stop()
             audioEngine.inputNode.removeTap(onBus: 0)
@@ -98,8 +98,8 @@ class SimpleSoundClassifier: NSObject, ObservableObject {
         }
         
         DispatchQueue.main.async {
-            self.isListening = false
-            self.currentTopSound = "Not listening"
+            self.ouvindo = false
+            self.somIdentificado = "Not listening"
             self.audioLevel = 0.0
         }
     }
@@ -142,18 +142,18 @@ class SimpleSoundClassifier: NSObject, ObservableObject {
                 let sounds = ["Speech", "Human voice", "Conversation", "Talking"]
                 let randomSound = sounds.randomElement() ?? "Speech"
                 let confidence = Int(rms * 1000) % 40 + 60 // 60-100%
-                self.currentTopSound = "\(randomSound) (\(confidence)%)"
+                self.somIdentificado = "\(randomSound) (\(confidence)%)"
             } else if rms > 0.005 {
-                self.currentTopSound = "Background noise (45%)"
+                self.somIdentificado = "Background noise (45%)"
             } else {
-                self.currentTopSound = "Silence (30%)"
+                self.somIdentificado = "Silence (30%)"
             }
         }
     }
 }
 
 // MARK: - SNResultsObserving
-extension SimpleSoundClassifier: SNResultsObserving {
+extension DetectorDeSom: SNResultsObserving {
     func request(_ request: SNRequest, didProduce result: SNResult) {
         print("🎵 SoundAnalysis produced result!")
         
@@ -174,14 +174,14 @@ extension SimpleSoundClassifier: SNResultsObserving {
         print("🎵 Best: \(bestClassification.identifier) (\(confidence)%)")
         
         DispatchQueue.main.async {
-            self.currentTopSound = "\(bestClassification.identifier) (\(confidence)%)"
+            self.somIdentificado = "\(bestClassification.identifier) (\(confidence)%)"
         }
     }
     
     func request(_ request: SNRequest, didFailWithError error: Error) {
         print("❌ SoundAnalysis failed: \(error)")
         DispatchQueue.main.async {
-            self.error = "Classification failed: \(error.localizedDescription)"
+            self.erro = "Classification failed: \(error.localizedDescription)"
         }
     }
     
