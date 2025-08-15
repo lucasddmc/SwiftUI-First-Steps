@@ -4,7 +4,7 @@ import SoundAnalysis
 
 class DetectorDeSom: NSObject, ObservableObject {
     @Published var ouvindo = false
-    @Published var somIdentificado = "Not listening"
+    @Published var somIdentificado = "Não ouvindo"
     @Published var audioLevel: Float = 0.0
     @Published var erro: String?
     
@@ -75,7 +75,7 @@ class DetectorDeSom: NSObject, ObservableObject {
             DispatchQueue.main.async {
                 self.ouvindo = true
                 self.erro = nil
-                self.somIdentificado = "Listening..."
+                self.somIdentificado = "Ouvindo..."
             }
             
         } catch {
@@ -99,7 +99,7 @@ class DetectorDeSom: NSObject, ObservableObject {
         
         DispatchQueue.main.async {
             self.ouvindo = false
-            self.somIdentificado = "Not listening"
+            self.somIdentificado = "Não ouvindo"
             self.audioLevel = 0.0
         }
     }
@@ -137,16 +137,16 @@ class DetectorDeSom: NSObject, ObservableObject {
         let rms = sqrt(samples.map { $0 * $0 }.reduce(0, +) / Float(samples.count))
         
         DispatchQueue.main.async {
-            // Simulate different classifications based on audio level
+            // Simulate different classifications based on audio level using Portuguese
             if rms > 0.01 {
-                let sounds = ["Speech", "Human voice", "Conversation", "Talking"]
-                let randomSound = sounds.randomElement() ?? "Speech"
-                let confidence = Int(rms * 1000) % 40 + 60 // 60-100%
-                self.somIdentificado = "\(randomSound) (\(confidence)%)"
+                let sounds = ["speech", "human_voice", "conversation"]
+                let randomSound = sounds.randomElement() ?? "speech"
+                let confidence = Float(Int(rms * 1000) % 40 + 60) / 100.0 // 60-100%
+                self.somIdentificado = TraducaoSons.traduzirComConfianca(randomSound, confianca: confidence)
             } else if rms > 0.005 {
-                self.somIdentificado = "Background noise (45%)"
+                self.somIdentificado = TraducaoSons.traduzirComConfianca("background_noise", confianca: 0.45)
             } else {
-                self.somIdentificado = "Silence (30%)"
+                self.somIdentificado = TraducaoSons.traduzirComConfianca("silence", confianca: 0.30)
             }
         }
     }
@@ -174,7 +174,8 @@ extension DetectorDeSom: SNResultsObserving {
         print("🎵 Best: \(bestClassification.identifier) (\(confidence)%)")
         
         DispatchQueue.main.async {
-            self.somIdentificado = "\(bestClassification.identifier) (\(confidence)%)"
+            // Use Portuguese translation for the classification
+            self.somIdentificado = TraducaoSons.traduzirComConfianca(bestClassification.identifier, confianca: Float(bestClassification.confidence))
         }
     }
     

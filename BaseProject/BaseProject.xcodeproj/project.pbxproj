@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A35C6CC2E4F4A2D009C4DB6 /* TraducaoSons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A35C6CB2E4F4A2D009C4DB6 /* TraducaoSons.swift */; };
 		5ADA4F3A2E4EAA150003A14E /* DetectorDeSom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ADA4F392E4EAA150003A14E /* DetectorDeSom.swift */; };
 		84A585A72E4CD28700F1F684 /* BaseProjectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A585A62E4CD28700F1F684 /* BaseProjectApp.swift */; };
 		84A585A92E4CD28700F1F684 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A585A82E4CD28700F1F684 /* ContentView.swift */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5A35C6CB2E4F4A2D009C4DB6 /* TraducaoSons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraducaoSons.swift; sourceTree = "<group>"; };
 		5ADA4F392E4EAA150003A14E /* DetectorDeSom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectorDeSom.swift; sourceTree = "<group>"; };
 		84A585A32E4CD28700F1F684 /* BaseProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BaseProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84A585A62E4CD28700F1F684 /* BaseProjectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseProjectApp.swift; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 		84A585A52E4CD28700F1F684 /* BaseProject */ = {
 			isa = PBXGroup;
 			children = (
+				5A35C6CB2E4F4A2D009C4DB6 /* TraducaoSons.swift */,
 				5ADA4F392E4EAA150003A14E /* DetectorDeSom.swift */,
 				84A585A62E4CD28700F1F684 /* BaseProjectApp.swift */,
 				84A585A82E4CD28700F1F684 /* ContentView.swift */,
@@ -143,6 +146,7 @@
 				84A585A92E4CD28700F1F684 /* ContentView.swift in Sources */,
 				5ADA4F3A2E4EAA150003A14E /* DetectorDeSom.swift in Sources */,
 				84A585A72E4CD28700F1F684 /* BaseProjectApp.swift in Sources */,
+				5A35C6CC2E4F4A2D009C4DB6 /* TraducaoSons.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
